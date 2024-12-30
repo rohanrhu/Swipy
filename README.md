@@ -9,7 +9,7 @@ Swipy is a SwiftUI library for creating swipe actions. It allows you to easily a
     Make swipe actions easily.
 </p>
 <p align="center">
-    <img src="https://meowingcat.io/images/SwipyDemo.gif" alt="Swipy, SwiftUI swipe actions library." />
+    <img src="https://github.com/user-attachments/assets/efc36796-0502-4a8d-8131-f974550b908d" alt="Swipy, SwiftUI swipe actions library." />
 </o>
 
 ## Why?
