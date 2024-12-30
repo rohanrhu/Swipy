@@ -87,7 +87,7 @@ and you'll use this for your `ScrollView`'s `.scrollDisabled(_ disabled: Bool)` 
 To make a view swipeable, you need to wrap it in a `Swipy` and provide the `isSwipingAnItem` binding.
 
 ```swift
-Swipy(isSwipingAnItem: $isSwipingAnItem) {
+Swipy(isSwipingAnItem: $isSwipingAnItem) { model in
     Text("Swipe me!")
 }
 ```
@@ -97,12 +97,77 @@ Swipy(isSwipingAnItem: $isSwipingAnItem) {
 You can add actions to a swipeable view by providing a closure that returns a view for each action.
 
 ```swift
-Swipy(isSwipingAnItem: $isSwipingAnItem) {
+Swipy(isSwipingAnItem: $isSwipingAnItem) { model in
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
+        } label: {
+            Image(systemName: "trash")
+                .foregroundStyle(.white)
+        }
+    }
+}
+```
+
+## SwipyModel
+
+`SwipyModel` is a model that is passed to the `SwipyAction`'s content closure. It provides information about the current swipe state.
+
+### Properties
+
+- `swipeOffset`: The current swipe offset.
+- `isSwiping`: A boolean that indicates whether an item is being swiped.
+- `isScrolling`: A boolean that indicates whether the container is scrolling.
+- `isSwiped`: A boolean that indicates whether an item is swiped.
+- `swipeActionsWidth`: The width of the swipe actions view.
+- `contentSize`: The size of the content view.
+- `swipeActionsMargin`: The margin for swipe actions.
+- `swipeThreshold`: The swipe threshold calculator function.
+- `swipeBehavior`: The behavior for swipe actions.
+- `scrollBehavior`: The behavior for scroll actions.
+
+### Methods
+
+- `swipe()`: Swipes the item.
+- `unswipe()`: Unswipes the item.
+
+> [!NOTE]
+> You can use `SwipyModel` to unswipe your item after an action is performed.
+
+### Unswiping when action is performed imperatively
+
+You can unswipe your item after an action is performed by calling the `unswipe()` method on the `SwipyModel`.
+
+```swift
+SwipyAction { model in
+    Button {
+        print("Delete")
+        model.unswipe()
+    } label: {
+        Image(systemName: "trash")
+            .foregroundStyle(.white)
+    }
+}
+```
+
+### Swiping an item imperatively
+
+You can swipe an item imperatively by calling the `swipe()` method on the `SwipyModel`.
+
+```swift
+Swipy(isSwipingAnItem: $isSwipingAnItem) { model in
+    Button {
+        model.swipe()
+    } label: {
+        Text("Swipe me!")
+    }
+} actions: {
+    SwipyAction { model in
+        Button {
+            model.swipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -117,17 +182,19 @@ Swipy has customizations to make it fit your app's design and provide best user 
 
 ### View: `Swipy`
 
-`Swipy` takes these arguments:
+`Swipy` takes the following arguments and provide a `SwipyModel` to its sub-views.
+
+It takes these arguments:
 
 - `isSwipingAnItem`: A binding that indicates whether an item is being swiped.
 - `content`: A closure that returns the view to be swiped.
 - `actions`: A closure that returns a view for each action.
-- (Optional) `swipeActionsMargin`: The margin for swipe actions, a `SwipyHorizontalMargin` struct.
+- (Optional) `SwipyActionsMargin`: The margin for swipe actions, a `SwipyHorizontalMargin` struct.
 - (Optional) `swipeThreshold`: The swipe threshold calculator function.
 - (Optional) `swipeBehavior`: The behavior for swipe actions, a `SwipySwipeBehavior` struct.
 - (Optional) `scrollBehavior`: The behavior for scroll actions, a `SwipyScrollBehavior` struct.
 
-#### Option: `swipeActionsMargin: SwipyHorizontalMargin(leading: Double, trailing: Double)`
+#### Option: `SwipyActionsMargin: SwipyHorizontalMargin(leading: Double, trailing: Double)`
 
 - `leading`: The margin on the leading side of the swipe actions.
 - `trailing`: The margin on the trailing side of the swipe actions.
@@ -139,10 +206,10 @@ Swipy has customizations to make it fit your app's design and provide best user 
 
 Function that calculates the swipe threshold. The function takes a `SwipyModel` and returns a `Double`.
 
-You'll most likely want to use calculate the swipe threshold based on the width of the swipe actions view that is a property in the `SwipyModel`. (`\.swipeActionsWidth`)
+You'll most likely want to use calculate the swipe threshold based on the width of the swipe actions view that is a property in the `SwipyModel`. (`\.SwipyActionsWidth`)
 
 > [!NOTE]
-> Default: `\.swipeActionsWidth`
+> Default: `\.SwipyActionsWidth`
 
 #### Option: `swipeBehavior: SwipySwipeBehavior`
 
@@ -154,11 +221,11 @@ The behavior for scroll actions. You can use predefined behaviors or create cust
 
 ### View: `SwipyAction`
 
-`SwipeAction` takes these arguments:
+`SwipyAction` takes these arguments:
 
-- `content`: A closure that returns the view for the action.
+- `content(SwipyModel)`: A closure that returns the view for the action.
 
-This view has no customizations. You can customize the action view as you like.
+`SwipyAction` provides one argument to your sub-view body `SwipyModel`. You'll most likely want to use this **to unswipe your item after an action is performed**.
 
 ## Behaviors
 
@@ -200,9 +267,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -224,9 +292,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -250,9 +319,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -270,9 +340,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -304,9 +375,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -330,9 +402,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -354,9 +427,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -374,9 +448,10 @@ Swipy(
 ) {
     Text("Swipe me!")
 } actions: {
-    SwipyAction {
+    SwipyAction { model in
         Button {
             print("Delete")
+            model.unswipe()
         } label: {
             Image(systemName: "trash")
                 .foregroundStyle(.white)
@@ -402,7 +477,7 @@ struct MyView: View {
         ScrollView {
             LazyVStack(spacing: 20) {
                 ForEach(items, id: \.self) { item in
-                    Swipy(isSwipingAnItem: $isSwipingAnItem) {
+                    Swipy(isSwipingAnItem: $isSwipingAnItem) { model in
                         Text(item)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -415,10 +490,11 @@ struct MyView: View {
                             .foregroundColor(.black)
                     } actions: {
                         HStack {
-                            SwipyAction {
+                            SwipyAction { model in
                                 Button {
                                     withAnimation(.bouncy) {
                                         items.removeAll { $0 == item }
+                                        model.unswipe()
                                     }
                                 } label: {
                                     Image(systemName: "trash")
@@ -431,8 +507,12 @@ struct MyView: View {
                                 .cornerRadius(16)
                             }
 
-                            SwipyAction {
-                                Button {} label: {
+                            SwipyAction { model in
+                                Button {
+                                    withAnimation(.bouncy) {
+                                        model.unswipe()
+                                    }
+                                } label: {
                                     Image(systemName: "pencil")
                                         .font(.system(size: 20))
                                         .padding(.horizontal)
@@ -455,12 +535,14 @@ struct MyView: View {
 
 ## Donations ❤️
 
-You love [MacsyZones](https://macsyzones.com)? You can support the development by making a donation. You have the following options to donate:
+You can support the development by making a donation. You have the following options to donate:
 
 - [Patreon](https://www.patreon.com/evrenselkisilik)
 - [GitHub Sponsors](https://github.com/sponsors/rohanrhu)
 
 You can also support me by buying my [MacsyZones](https://macsyzones.com) app. 🥳
+
+Also see [MacsyZones GitHub repo](https://github.com/rohanrhu/MacsyZones) because it is open source too. 🥳
 
 ### Cryptocurrency Donations
 
@@ -474,7 +556,7 @@ Preferably, donating USDT or USDC is recommended but you can donate any of the a
 
 ## Contributing
 
-We welcome contributions to MacsyZones. Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
+We welcome contributions to Swipy. Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
 
 ## Code of Conduct
 
