@@ -191,6 +191,12 @@ public class SwipyModel: ObservableObject {
     }
 }
 
+public struct SwipyTouchableDisabledStyle: ButtonStyle {
+    public func makeBody(configuration: Configuration) -> some View {
+        configuration.label.background(.clear)
+    }
+}
+
 public struct Swipy<C, A>: View where C: View, A: View {
     public let content: (SwipyModel) -> C
     public let actions: () -> A
@@ -205,14 +211,21 @@ public struct Swipy<C, A>: View where C: View, A: View {
         let swipeActionOpacity = min(threshold, abs(model.swipeOffset.width)) / threshold
 
         ZStack {
-            content(model)
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear { model.contentSize = geometry.size }
-                            .onChange(of: geometry.size.width) { newValue in model.contentSize?.width = newValue }
-                    }
-                )
+            ZStack {
+                HStack(spacing: 0) {
+                    content(model)
+                        .disabled(model.isSwiping || model.isSwiped)
+                        .buttonStyle(SwipyTouchableDisabledStyle())
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onAppear { model.contentSize = geometry.size }
+                                    .onChange(of: geometry.size.width) { newValue in model.contentSize?.width = newValue }
+                            }
+                        )
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             GeometryReader { geometry in
                 HStack(spacing: 0) {
