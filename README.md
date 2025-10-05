@@ -32,7 +32,7 @@ First, after discovering that `List` is extremely buggy, I found a swipe actions
 Swipy supports minimum **iOS 15**.
 
 > [!CAUTION]
-> Swipy's `isSwipingAnItem` binding is useful with `ScrollView`'s `.scrollDisabled(_ disabled: Bool)` modifier but this modifier requires minimum **iOS 16**. However, you still have `isSwipingANItem` so, you can avoid scrolling if somehow it is `true`.
+> Swipy's `isSwipingAnItem` binding is useful with `ScrollView`'s `.scrollDisabled(_ disabled: Bool)` modifier but this modifier requires minimum **iOS 16**. However, you still have `isSwipingAnItem` so, you can avoid scrolling if somehow it is `true`.
 
 ## Installation
 
